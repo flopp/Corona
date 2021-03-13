@@ -10,9 +10,6 @@ import cov_dates as cd
 import json
 import ndjson
 
-# cd /Users/pavel/Corona/2020-rki-archive/data/2_parsed
-# python ~/Corona/convertARD.py -d ~/Corona/archive_ard/ *.bz2
-
 def datetimeFromARDFilenameBZ2(ds):
     st = time.strptime(ds, "data_%Y-%m-%d-%H-%M.json.bz2")
     stf = time.mktime(st)
@@ -35,7 +32,7 @@ def convert(compressedJSONFile, destDir=".", force = False):
     fileName = path.split(os.sep)[-1]
     date = datetimeFromARDFilename(fileName)
     day = cd.dayFromDate(date)
-    newFile =  destDir+"/NPGEO-RKI-{}.csv".format(cd.dateStrYMDFromDay(day))
+    newFile =  destDir+"/NPGEO-RKI-{}.csv.gz".format(cd.dateStrYMDFromDay(day))
 
     if force or not os.path.isfile(newFile):
         print("Loading " + compressedJSONFile)
@@ -44,7 +41,8 @@ def convert(compressedJSONFile, destDir=".", force = False):
             content = ndjson.load(f)
             frame = dt.Frame(content)
             print("Saving " + newFile)
-            frame.to_csv(newFile)
+            frame.to_csv(newFile, compression="gzip")
+
     else:
         print("Skipping '{}' because '{}' already exists".format(compressedJSONFile, newFile))
 
